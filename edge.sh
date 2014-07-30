@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Stop the script if it's already intalled. 
+# Stop the script if it's already intalled.
 if [[ -e /tmp/edge_installed ]]; then
   exit 0
 fi
@@ -18,20 +18,27 @@ compile_libpar2(){
   rm -rf cd /tmp/libpar2
 }
 
+if [[ -n $EDGE ]]; then
 
-apt-get update -q
-
-if [[ -z $EDGE ]]; then
-  apt-get install nzbget
-else
-  regex_version="\d*?\.\d*?"
+  # Set SVN to version, revision or trunk
+  regex_version="[0-9]{2}\.[0-9]*?"
+  regex_revision="[0-9]{4}"
   if [[ $EDGE =~ $regex_version ]]; then
     SVN="svn://svn.code.sf.net/p/nzbget/code/tags/${EDGE}"
     echo "Checking out version ${EDGE}"
-  else
+  elif [[ $EDGE =~ $regex_revision ]]; then
     SVN="-r ${EDGE} svn://svn.code.sf.net/p/nzbget/code/trunk"
     echo "Checking out revision $EDGE"
+  else
+    SVN="svn://svn.code.sf.net/p/nzbget/code/trunk"
+    echo "Checking out the trunk version"
   fi
+
+  # Update sources
+  apt-get update -qq
+
+  # Remove libpar2 and nzbget
+  apt-get remove -y nzbget libpar2-1
 
   # Install build dependencies
   apt-get install -qy libncurses5-dev sigc++ libssl-dev libxml2-dev sigc++ build-essential subversion wget
