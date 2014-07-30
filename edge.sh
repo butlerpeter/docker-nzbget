@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# Stop the script if it's already intalled. 
+if [[ -e /tmp/edge_installed ]]; then
+  exit 0
+fi
+
 compile_libpar2(){
   mkdir /tmp/libpar2
   wget -nv https://launchpad.net/libpar2/trunk/0.4/+download/libpar2-0.4.tar.gz -O - | tar --strip-components 1 -C /tmp/libpar2 -zxf - 
@@ -12,9 +18,6 @@ compile_libpar2(){
   rm -rf cd /tmp/libpar2
 }
 
-if [[ -e /tmp/edge_installed ]]; then
-  exit 0
-fi
 
 apt-get update -q
 
@@ -41,7 +44,7 @@ else
 
   # Build and install the source code
   cd /tmp/nzbget-source
-  ./configure --prefix=/usr --enable-parcheck --disable-shared
+  ./configure --prefix=/usr --enable-parcheck
   make -j5
   make install
 
